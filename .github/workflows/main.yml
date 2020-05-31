@@ -62,6 +62,9 @@ jobs:
     name: Build Package
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    env:
+      GITHUB_RUN_ID: ${{secrets.GITHUB_RUN_ID}}
+      GITHUB_RUN_NUMBER: ${{secrets.GITHUB_RUN_NUMBER}}
 
     steps:
     - uses: actions/checkout@v2
@@ -73,6 +76,21 @@ jobs:
 
     - name: Build Package
       run: vc-build Compress -skip Test
+
+    - name: Jira Extract Issue Keys
+      id: jira_keys
+      uses: HighwayThree/jira-extract-issue-keys@v0.2-alpha
+      with:
+        # if true, other input parameters will be ignored and keys from commits associated with pull request will be retrieved and parsed for Jira keys
+        is-pull-request: true # optional
+
+    - name: Jira Upload Build Info
+      uses: HighwayThree/jira-upload-build-info@master
+      with:
+        client-id: '${{ secrets.CLIENT_ID }}'
+        client-secret: '${{ secrets.CLIENT_SECRET }}'
+        cloud-instance-base-url: '${{ secrets.CLOUD_INSTANCE_BASE_URL }}'
+        issue-keys: "${{ steps.jira_keys.outputs.jira-keys }}"
 
     - name: Build Docker Image
       run: |
