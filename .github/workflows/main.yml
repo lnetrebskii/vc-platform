@@ -222,15 +222,24 @@ jobs:
         docker push ${{ secrets.DOCKER_USERNAME }}/platform:$PLATFORM_DOCKER_TAG
 
     - name: Jira Extract Issue Keys
-      if: ${{ secrets.CLIENT_ID != 0 && secrets.CLIENT_SECRET != 0 && secrets.CLOUD_INSTANCE_BASE_URL != 0 }}
+      if: ${{ env.CLIENT_ID != 0 && env.CLIENT_SECRET != 0 && env.CLOUD_INSTANCE_BASE_URL != 0 }}
+      env:
+        CLIENT_ID: ${{secrets.CLIENT_ID}}
+        CLIENT_SECRET: ${{secrets.CLIENT_SECRET}}
+        CLOUD_INSTANCE_BASE_URL: ${{secrets.CLOUD_INSTANCE_BASE_URL}}
       id: jira_keys
       uses: HighwayThree/jira-extract-issue-keys@v0.2-alpha
       with:
         # if true, other input parameters will be ignored and keys from commits associated with pull request will be retrieved and parsed for Jira keys
-        is-pull-request: true # optional
+        is-pull-request: true
+        parse-all-commits: true
 
     - name: Jira Upload Build Info
-      if: ${{ secrets.CLIENT_ID != 0 && secrets.CLIENT_SECRET != 0 && secrets.CLOUD_INSTANCE_BASE_URL != 0 && steps.jira_keys.outputs.jira-keys != 0 }}
+      if: ${{ env.CLIENT_ID != 0 && env.CLIENT_SECRET != 0 && env.CLOUD_INSTANCE_BASE_URL != 0 && steps.jira_keys.outputs.jira-keys != 0 }}
+      env:
+        CLIENT_ID: ${{secrets.CLIENT_ID}}
+        CLIENT_SECRET: ${{secrets.CLIENT_SECRET}}
+        CLOUD_INSTANCE_BASE_URL: ${{secrets.CLOUD_INSTANCE_BASE_URL}}
       uses: HighwayThree/jira-upload-build-info@master
       with:
         client-id: '${{ secrets.CLIENT_ID }}'
