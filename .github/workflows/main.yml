@@ -65,6 +65,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: View head sha
+      run: |
+        ${{ github.sha }}
+        ${{ github.head_ref }}
+        ${{ github.pull_request.head.ref }}
+        ${{ github.pull_request.head.sha }}
+
     - name: Get Image Tag
       shell: pwsh
       run: |
