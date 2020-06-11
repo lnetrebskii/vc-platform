@@ -140,7 +140,7 @@ jobs:
           $versionSuffixNode.InnerText = "${{ github.run_number }}"
           $buildPropsXml.Save("Directory.Build.props")
         }
-        Get-ChildItem -Path src -Filter "*.csproj" -Recurse | ForEach-Object {
+        Get-ChildItem -Path . -Filter "*.csproj" -Recurse | ForEach-Object {
             [Xml]$xml = Get-Content -Path $_.FullName;
             $repositoryUrl = $xml.CreateElement("RepositoryUrl")
             $repositoryUrl.InnerText = "https://github.com/$('${{ github.repository }}'.ToLower())"
